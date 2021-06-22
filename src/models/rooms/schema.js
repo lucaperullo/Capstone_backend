@@ -1,14 +1,13 @@
 import mongoose from "mongoose";
-const { Schema, model } = mongoose;
 
-const RoomSchema = new Schema({
+export const RoomModel = new mongoose.Schema({
   name: {
     type: String,
     required: true,
   },
   participants: [
     {
-      user: { type: Schema.Types.ObjectId, ref: "user" },
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
       socketId: { type: String },
     },
   ],
@@ -25,7 +24,7 @@ const RoomSchema = new Schema({
   },
 });
 
-RoomSchema.statics.addUserToRoom = async function (userId, roomId) {
+RoomModel.statics.addUserToRoom = async function (userId, roomId) {
   try {
     const updatedRoom = await this.findByIdAndUpdate(roomId, {
       $addToSet: { participants: { user: userId } },
@@ -35,4 +34,4 @@ RoomSchema.statics.addUserToRoom = async function (userId, roomId) {
     next(error);
   }
 };
-export default model("Room", RoomSchema);
+export default mongoose.model("Room", RoomModel);

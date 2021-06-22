@@ -6,7 +6,7 @@ const validateEmail = function (email) {
   return re.test(email);
 };
 
-const UserSchema = new Schema({
+const UserModel = new Schema({
   username: {
     type: String,
     required: true,
@@ -39,7 +39,7 @@ const UserSchema = new Schema({
   rooms: [{ type: Schema.Types.ObjectId, ref: "room" }],
 });
 
-UserSchema.methods.toJSON = function () {
+UserModel.methods.toJSON = function () {
   const user = this;
   const userObject = user.toObject();
 
@@ -49,7 +49,7 @@ UserSchema.methods.toJSON = function () {
   return userObject;
 };
 
-UserSchema.pre("save", async function (next) {
+UserModel.pre("save", async function (next) {
   const user = this;
   const plainPW = user.password;
 
@@ -59,8 +59,8 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-UserSchema.statics.findByCredentials = async function (email, password) {
-  const user = await this.findOne({ email });
+UserModel.statics.findByCredentials = async function (username, password) {
+  const user = await this.findOne({ username });
 
   if (user) {
     const isMatch = await bcrypt.compare(password, user.password);
@@ -71,7 +71,7 @@ UserSchema.statics.findByCredentials = async function (email, password) {
   }
 };
 
-UserSchema.statics.addRoomToUser = async function (userId, roomId) {
+UserModel.statics.addRoomToUser = async function (userId, roomId) {
   try {
     const updatedUser = await this.findByIdAndUpdate(userId, {
       $addToSet: { rooms: roomId },
@@ -82,4 +82,4 @@ UserSchema.statics.addRoomToUser = async function (userId, roomId) {
   }
 };
 
-export default model("User", UserSchema);
+export default model("User", UserModel);

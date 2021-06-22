@@ -5,12 +5,13 @@ import mongoose from "mongoose";
 import { Server } from "socket.io";
 import { createServer } from "http";
 
-import userRoutes from "./models/user/index.js";
+import userRoutes from "./models/users/index.js";
 import authRoutes from "./guard/authentication.js";
 
 import cors from "cors";
 import createSocketServer from "./socket/index.js";
 import verifyToken from "./middlewares/jwt.js";
+import contactsRoute from "./models/rooms/index.js";
 const app = express();
 
 const httpServer = createServer(app);
@@ -22,8 +23,9 @@ app.use(cors());
 app.use(express.json());
 
 // routes
-app.use("/", authRoutes);
-app.use("/users",verifyToken, userRoutes);
+app.use("/auth", authRoutes);
+app.use("/users", verifyToken, userRoutes);
+app.use("/contacts", contactsRoute)
 
 const PORT = process.env.PORT || 7000;
 

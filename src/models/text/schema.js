@@ -1,12 +1,14 @@
-import { Schema } from "mongoose";
-export const MessageSchema = new Schema(
+import mongoose from "mongoose";
+
+export const MessageModel = new mongoose.Schema(
   {
     text: {
       type: String,
       required: true,
     },
-    sender: { type: Schema.Types.ObjectId, ref: "Users" },
-    room: { type: Schema.Types.ObjectId, ref: "Rooms" },
+    sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    room: { type: mongoose.Schema.Types.ObjectId, ref: "Room" },
   },
   { timestamps: true }
 );
+export default mongoose.model("Text", MessageModel);

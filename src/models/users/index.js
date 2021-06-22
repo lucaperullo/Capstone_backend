@@ -6,11 +6,12 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import jwt from "jsonwebtoken";
 
 import axios from "axios";
+import { authorizeUser } from "../../middlewares/jwt.js";
 
 const userRoutes = express.Router();
 
-userRoutes.get("/me", async (req, res, next) => {
-  const token = req.headers.authorization.split(" ")[1];
+userRoutes.get("/me", authorizeUser,async (req, res, next) => {
+  const token = req.cookies.accessToken
 
   const decoded = await jwt.verify(token, process.env.JWT_ACCESS_TOKEN);
   const user = (req.userData = decoded).sub[0];
