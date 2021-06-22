@@ -9,7 +9,7 @@ authRoutes.post("/register", async (req, res, next) => {
   try {
     const newUser = await UserModel.create(req.body);
     if (newUser) {
-      const tokens = await authenticateUser(user);
+      const tokens = await authenticateUser(newUser);
       const username = req.body.username;
       const email = req.body.email;
       const access_token = await jwt.sign(
