@@ -13,7 +13,6 @@ const UserModel = new Schema({
   },
   phone: {
     type: String,
-    unique: true,
   },
   email: {
     type: String,
