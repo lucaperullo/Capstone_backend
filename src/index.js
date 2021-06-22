@@ -17,7 +17,22 @@ const app = express();
 const httpServer = createServer(app);
 
 createSocketServer(httpServer);
-
+const whitelist = [
+  "http://localhost:3000",
+  "http://localhost:3000/login",
+  "https://capstone-tau.vercel.app",
+  "https://capstone-tau.vercel.app/chat",
+];
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+};
 app.use(cors());
 
 app.use(express.json());
@@ -25,7 +40,7 @@ app.use(express.json());
 // routes
 app.use("/auth", authRoutes);
 app.use("/users", verifyToken, userRoutes);
-app.use("/contacts", contactsRoute)
+app.use("/contacts", contactsRoute);
 
 const PORT = process.env.PORT || 7000;
 
