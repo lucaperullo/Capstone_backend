@@ -17,12 +17,7 @@ const app = express();
 const httpServer = createServer(app);
 
 createSocketServer(httpServer);
-const whitelist = [
-  "http://localhost:3000",
-  "http://localhost:3000/login",
-  "https://capstone-tau.vercel.app",
-  "https://capstone-tau.vercel.app/chat",
-];
+const whitelist = ["http://localhost:3000", "https://capstone-tau.vercel.app"];
 const corsOptions = {
   origin: (origin, callback) => {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
@@ -33,7 +28,7 @@ const corsOptions = {
   },
   credentials: true,
 };
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
