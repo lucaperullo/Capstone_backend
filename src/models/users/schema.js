@@ -34,8 +34,8 @@ const UserModel = new Schema({
     default:
       "https://media.discordapp.net/attachments/815874328108204045/856844965522046986/image-removebg-preview.png",
   },
-  associates: [{ type: Schema.Types.ObjectId, ref: "user" }],
-  rooms: [{ type: Schema.Types.ObjectId, ref: "room" }],
+  associates: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  rooms: [{ type: Schema.Types.ObjectId, ref: "Room" }],
 });
 
 UserModel.methods.toJSON = function () {

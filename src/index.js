@@ -8,9 +8,10 @@ import { createServer } from "http";
 import userRoutes from "./models/users/index.js";
 import authRoutes from "./guard/authentication.js";
 
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import createSocketServer from "./socket/index.js";
-import verifyToken from "./middlewares/jwt.js";
+
 import contactsRoute from "./models/rooms/index.js";
 const app = express();
 
@@ -19,8 +20,7 @@ const httpServer = createServer(app);
 createSocketServer(httpServer);
 const whitelist = ["http://localhost:3000", "https://capstone-tau.vercel.app"];
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://capstone-tau.vercel.app"],
-
+  origin: ["http://localhost:3999", "https://capstone-tau.vercel.app"],
   credentials: true,
   exposedHeaders: ["set-cookie"],
 };
@@ -28,10 +28,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
-
+app.use(cookieParser());
 // routes
 app.use("/auth", authRoutes);
-app.use("/users", verifyToken, userRoutes);
+app.use("/users", userRoutes);
 app.use("/contacts", contactsRoute);
 
 const PORT = process.env.PORT || 7000;
@@ -40,6 +40,9 @@ mongoose
   .connect(process.env.MONGO_ATLAS, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    createIndexes: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
   })
   .then(
     httpServer.listen(
