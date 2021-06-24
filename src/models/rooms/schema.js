@@ -7,7 +7,7 @@ export const RoomModel = new mongoose.Schema({
   },
   participants: [
     {
-      user: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
       socketId: { type: String },
     },
   ],

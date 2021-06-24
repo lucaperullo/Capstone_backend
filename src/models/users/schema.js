@@ -24,6 +24,10 @@ const UserModel = new Schema({
       "Please fill a valid email address",
     ],
   },
+  bio: {
+    type: String,
+    default: "Hey there, Im new to OutMusic!",
+  },
   password: {
     type: String,
     required: true,
@@ -31,8 +35,7 @@ const UserModel = new Schema({
   },
   profilePic: {
     type: String,
-    default:
-      "https://media.discordapp.net/attachments/815874328108204045/856844965522046986/image-removebg-preview.png",
+    default: "https://i.ibb.co/Fm5L0fZ/user-default.png",
   },
   associates: [{ type: Schema.Types.ObjectId, ref: "User" }],
   rooms: [{ type: Schema.Types.ObjectId, ref: "Room" }],

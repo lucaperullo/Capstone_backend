@@ -22,13 +22,7 @@ contactsRoute.post("/", authorizeUser, async (req, res, next) => {
 //GET ALL ROOMS
 contactsRoute.get("/", authorizeUser, async (req, res, next) => {
   try {
-    const allRooms = await RoomSchema.find().populate({
-      path: "participants",
-      populate: {
-        path: "user",
-        model: "user",
-      },
-    });
+    const allRooms = await RoomSchema.find().populate("participants");
     res.send(allRooms);
   } catch (error) {
     console.log(error);

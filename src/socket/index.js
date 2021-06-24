@@ -9,7 +9,13 @@ import {
 } from "./socketRoutes.js";
 
 const createSocketServer = (server) => {
-  const io = new Server(server);
+  const io = new Server(server, {
+    allowEIO3: true,
+    cors: {
+      origin: "http://localhost:3000",
+      methods: ["GET, POST, PUT, DELETE"],
+    },
+  });
   io.on("connection", (socket) => {
     console.log("new connection:", socket.id);
 
@@ -68,6 +74,14 @@ const createSocketServer = (server) => {
     socket.on("CHAT_MESSAGE", async (data) => {
       await addMessageToRoom(data);
       socket.to(data.roomId).emit("CHAT_MESSAGE", data);
+    });
+    socket.on("LAST_SEEN", ({ userID }) => {
+      // console.log(userID);
+      activeSockets = activeSockets.filter((u) => u.userId !== userID);
+      activeSockets.push({ userId: userID, socketId: socket.id });
+
+      io.sockets.emit("getUsers", activeSockets);
+      // console.log(activeSockets);
     });
 
     socket.on("CANVAS_DATA", async (data) => {

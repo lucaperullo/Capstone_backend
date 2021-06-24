@@ -4,8 +4,9 @@ import UserSchema from "../models/users/schema.js";
 
 export const authorizeUser = async (req, res, next) => {
   try {
+    console.log(req.cookies);
     const accessToken = req.cookies.accessToken;
-    console.log(accessToken);
+
     const decoded = await verifyAccessToken(accessToken);
     const user = await UserSchema.findById(decoded._id).populate("rooms");
     if (!user) {

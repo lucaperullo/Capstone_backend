@@ -18,13 +18,12 @@ const app = express();
 const httpServer = createServer(app);
 
 createSocketServer(httpServer);
-const whitelist = ["http://localhost:3000", "https://capstone-tau.vercel.app"];
 const corsOptions = {
-  origin: ["http://localhost:3999", "https://capstone-tau.vercel.app"],
+  origin: ["http://localhost:3000", "https://capstone-tau.vercel.app"],
   credentials: true,
-  exposedHeaders: ["set-cookie"],
+  // exposedHeaders: ["set-cookie"],
 };
-
+// app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(cors(corsOptions));
 
 app.use(express.json());
