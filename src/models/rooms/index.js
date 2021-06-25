@@ -3,16 +3,33 @@ import { authorizeUser } from "../../middlewares/jwt.js";
 
 import RoomSchema from "./schema.js";
 import UserSchema from "../users/schema.js";
+import MessageSchema from "../text/schema.js";
 
 import sgMail from "@sendgrid/mail";
 
-const contactsRoute = express.Router();
+const roomRoute = express.Router();
 
-contactsRoute.post("/", authorizeUser, async (req, res, next) => {
+roomRoute.post("/:participantId", authorizeUser, async (req, res, next) => {
+  console.log(req.user._id);
   try {
-    const newRoom = await new RoomSchema(req.body);
-    const { _id } = await newRoom.save();
-    res.status(201).send({ message: _id });
+    const newRoom = await new RoomSchema({
+      name: req.body.name,
+      participants: [req.params.participantId, req.user._id],
+    });
+
+    const newRoomCreated = await newRoom.save();
+    newRoomCreated.participants.forEach(async (participant) => {
+      await UserSchema.findOneAndUpdate(
+        { _id: participant._id },
+        {
+          $push: {
+            rooms: newRoomCreated._id,
+          },
+        },
+        { runValidators: true, new: true }
+      );
+    });
+    res.status(201).send({ message: newRoomCreated._id });
   } catch (error) {
     console.log(error);
     next(error);
@@ -20,9 +37,9 @@ contactsRoute.post("/", authorizeUser, async (req, res, next) => {
 });
 
 //GET ALL ROOMS
-contactsRoute.get("/", authorizeUser, async (req, res, next) => {
+roomRoute.get("/", authorizeUser, async (req, res, next) => {
   try {
-    const allRooms = await RoomSchema.find().populate("participants");
+    const allRooms = await RoomSchema.find().populate("chatHistory");
     res.send(allRooms);
   } catch (error) {
     console.log(error);
@@ -31,7 +48,7 @@ contactsRoute.get("/", authorizeUser, async (req, res, next) => {
 });
 
 //GET ROOM BY ID
-contactsRoute.get("/:id", authorizeUser, async (req, res, next) => {
+roomRoute.get("/:id", authorizeUser, async (req, res, next) => {
   try {
     const singleRoom = await RoomSchema.findById(req.params.id);
     if (singleRoom) {
@@ -45,8 +62,34 @@ contactsRoute.get("/:id", authorizeUser, async (req, res, next) => {
   }
 });
 
+roomRoute.post("/text-to/:id", authorizeUser, async (req, res, next) => {
+  try {
+    const newMessage = new MessageSchema({
+      senderId: req.user._id,
+      text: req.body.text,
+      messagePic: req.file?.path ? req.file.path : "",
+    });
+    const message = { ...newMessage.toObject() };
+    const room = await RoomSchema.findByIdAndUpdate(
+      req.params.id,
+      {
+        $push: {
+          chatHistory: { ...message },
+        },
+      },
+      {
+        runValidators: true,
+        new: true,
+      }
+    );
+    res.status(200).send(room);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 //ADD USER TO ROOM AND VIS-VERSA
-contactsRoute.put(
+roomRoute.put(
   "/:roomId/add-user/:userId",
   authorizeUser,
   async (req, res, next) => {
@@ -68,7 +111,7 @@ contactsRoute.put(
 );
 
 //SEND JOIN EMAIL
-// contactsRoute.post(
+// roomRoute.post(
 //   "/addrequest/:roomId",
 //   authorizeUser,
 //   async (req, res, next) => {
@@ -94,4 +137,4 @@ contactsRoute.put(
 //     }
 //   }
 // );
-export default contactsRoute;
+export default roomRoute;

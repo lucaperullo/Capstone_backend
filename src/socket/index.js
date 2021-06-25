@@ -8,6 +8,9 @@ import {
   updateRoomCanvas,
 } from "./socketRoutes.js";
 
+
+let activeSockets = [];
+
 const createSocketServer = (server) => {
   const io = new Server(server, {
     allowEIO3: true,
@@ -16,9 +19,17 @@ const createSocketServer = (server) => {
       methods: ["GET, POST, PUT, DELETE"],
     },
   });
+
   io.on("connection", (socket) => {
     console.log("new connection:", socket.id);
-
+    socket.on("isOnline", ({ userID }) => {
+      // console.log(userID);
+      activeSockets = activeSockets.filter((u) => u.userId !== userID);
+      activeSockets.push({ userId: userID, socketId: socket.id });
+  
+      io.sockets.emit("getUsers", activeSockets);
+      // console.log(activeSockets);
+    });
     socket.on("JOIN_ROOM", async (data) => {
       try {
         socket.join(data.roomId);

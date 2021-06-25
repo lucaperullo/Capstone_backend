@@ -12,7 +12,8 @@ const userRoutes = express.Router();
 
 userRoutes.get("/me", authorizeUser, async (req, res, next) => {
   try {
-    res.send(req.user);
+    const user = await UserSchema.findById(req.user._id).populate("rooms");
+    res.send(user);
   } catch (error) {
     console.log(error);
     next(error);

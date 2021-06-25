@@ -1,14 +1,10 @@
 import mongoose from "mongoose";
 
-export const MessageModel = new mongoose.Schema(
-  {
-    text: {
-      type: String,
-      required: true,
-    },
-    sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    room: { type: mongoose.Schema.Types.ObjectId, ref: "Room" },
-  },
-  { timestamps: true }
-);
+const MessageModel = new mongoose.Schema({
+  senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  text: { type: String },
+  messagePic: { type: String },
+  createdAt: { type: Date },
+  updatedAt: { type: Date, required: true },
+});
 export default mongoose.model("Text", MessageModel);

@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-const { Schema, model } = mongoose;
+
 const validateEmail = function (email) {
   const re = /^\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$/;
   return re.test(email);
 };
 
-const UserModel = new Schema({
+const UserModel = new mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -37,8 +37,8 @@ const UserModel = new Schema({
     type: String,
     default: "https://i.ibb.co/Fm5L0fZ/user-default.png",
   },
-  associates: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  rooms: [{ type: Schema.Types.ObjectId, ref: "Room" }],
+  contacts: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  rooms: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
 });
 
 UserModel.methods.toJSON = function () {
@@ -84,4 +84,4 @@ UserModel.statics.addRoomToUser = async function (userId, roomId) {
   }
 };
 
-export default model("User", UserModel);
+export default mongoose.model("User", UserModel);

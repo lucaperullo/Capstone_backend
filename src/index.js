@@ -12,7 +12,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import createSocketServer from "./socket/index.js";
 
-import contactsRoute from "./models/rooms/index.js";
+import roomsRoute from "./models/rooms/index.js";
 const app = express();
 
 const httpServer = createServer(app);
@@ -31,7 +31,7 @@ app.use(cookieParser());
 // routes
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
-app.use("/contacts", contactsRoute);
+app.use("/rooms", roomsRoute);
 
 const PORT = process.env.PORT || 7000;
 

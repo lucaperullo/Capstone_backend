@@ -1,14 +1,29 @@
 import jwt from "jsonwebtoken";
-
+import mongoose from "mongoose";
 import UserSchema from "../models/users/schema.js";
 
 export const authorizeUser = async (req, res, next) => {
   try {
-    console.log(req.cookies);
     const accessToken = req.cookies.accessToken;
 
     const decoded = await verifyAccessToken(accessToken);
-    const user = await UserSchema.findById(decoded._id).populate("rooms");
+    const user = await UserSchema.findById(decoded._id)
+      .populate({
+        path: "rooms",
+
+        populate: {
+          path: "participants",
+        },
+      })
+      .populate({
+        path: "rooms",
+
+        populate: {
+          path: "chatHistory",
+        },
+      })
+      .exec();
+
     if (!user) {
       throw new Error();
     }
