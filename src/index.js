@@ -29,7 +29,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 // routes
-app.use("/auth", authRoutes);
+app.use("/", authRoutes);
 app.use("/users", userRoutes);
 app.use("/rooms", roomsRoute);
 

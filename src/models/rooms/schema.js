@@ -4,7 +4,6 @@ export const RoomModel = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
     },
     participants: [
       {
@@ -14,8 +13,11 @@ export const RoomModel = new mongoose.Schema(
     ],
     chatHistory: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Text",
+        senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        text: { type: String },
+        messagePic: { type: String },
+        createdAt: { type: Date },
+        updatedAt: { type: Date },
       },
     ],
     images: {

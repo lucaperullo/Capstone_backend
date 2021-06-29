@@ -15,14 +15,7 @@ export const authorizeUser = async (req, res, next) => {
           path: "participants",
         },
       })
-      .populate({
-        path: "rooms",
-
-        populate: {
-          path: "chatHistory",
-        },
-      })
-      .exec();
+      
 
     if (!user) {
       throw new Error();

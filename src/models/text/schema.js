@@ -5,6 +5,6 @@ const MessageModel = new mongoose.Schema({
   text: { type: String },
   messagePic: { type: String },
   createdAt: { type: Date },
-  updatedAt: { type: Date, required: true },
+  updatedAt: { type: Date },
 });
 export default mongoose.model("Text", MessageModel);

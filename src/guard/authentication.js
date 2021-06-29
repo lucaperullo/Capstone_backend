@@ -107,7 +107,7 @@ authRoutes.post("/logout", authorizeUser, async (req, res, next) => {
   }
 });
 
-authRoutes.get("/", authorizeUser, async (req, res, next) => {
+authRoutes.get("/users", authorizeUser, async (req, res, next) => {
   try {
     if (req.query.name) {
       const filteredUsers = await UserModel.find({
@@ -115,7 +115,16 @@ authRoutes.get("/", authorizeUser, async (req, res, next) => {
       }).populate("rooms");
       res.send(filteredUsers);
     } else {
-      const allUsers = await UserModel.find().populate("rooms");
+      const allUsers = await UserModel.find()
+        .populate("rooms")
+        .populate({
+          path: "rooms",
+
+          populate: {
+            path: "participants",
+          },
+        })
+        .exec();
       res.send(allUsers);
     }
   } catch (error) {

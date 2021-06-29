@@ -39,7 +39,7 @@ roomRoute.post("/:participantId", authorizeUser, async (req, res, next) => {
 //GET ALL ROOMS
 roomRoute.get("/", authorizeUser, async (req, res, next) => {
   try {
-    const allRooms = await RoomSchema.find().populate("chatHistory");
+    const allRooms = await RoomSchema.find().populate("participants");
     res.send(allRooms);
   } catch (error) {
     console.log(error);
