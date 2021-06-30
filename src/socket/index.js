@@ -8,7 +8,6 @@ import {
   updateRoomCanvas,
 } from "./socketRoutes.js";
 
-
 let activeSockets = [];
 
 const createSocketServer = (server) => {
@@ -26,29 +25,33 @@ const createSocketServer = (server) => {
       // console.log(userID);
       activeSockets = activeSockets.filter((u) => u.userId !== userID);
       activeSockets.push({ userId: userID, socketId: socket.id });
-  
+
       io.sockets.emit("getUsers", activeSockets);
       // console.log(activeSockets);
     });
+    //REMEMBER ME : join all the rooms async when the user logs in
     socket.on("JOIN_ROOM", async (data) => {
       try {
+        console.log({ JOINROOM: data });
         socket.join(data.roomId);
 
         await addUserSocketToRoom(data, socket.id);
+        //TODO : update user socketId
 
         const onlineMessage = {
-          sender: "Corporate God: Jeff Bazos",
+          sender: "Our-Music",
           text: `${data.username} is now online`,
           createdAt: new Date(),
         };
 
-        socket.to(data.roomId).broadcast.emit("CHAT_MESSAGE", onlineMessage);
+        socket.broadcast.emit("CHAT_MESSAGE", onlineMessage);
 
         const userList = await getUsersInRoom(data.roomId);
-        io.to(data.roomId).emit("roomData", {
+        io.to(socket.id).emit("roomData", {
           room: data.roomId,
           list: userList,
         });
+        //TODO check function get user in room
       } catch (error) {
         console.log(error);
       }
@@ -65,12 +68,12 @@ const createSocketServer = (server) => {
         await removeUserSocketFromRoom(data, socket.id);
 
         const offlineMessage = {
-          sender: "Corporate God: Jeff Bazos",
+          sender: "Our-Music",
           text: `${data.username} is now offline`,
           createdAt: new Date(),
         };
 
-        socket.to(data.roomId).broadcast.emit("CHAT_MESSAGE", offlineMessage);
+        socket.to(data.roomId).emit("CHAT_MESSAGE", offlineMessage);
 
         const userList = await getUsersInRoom(data.roomId);
         io.to(data.roomId).emit("roomData", {
@@ -83,6 +86,7 @@ const createSocketServer = (server) => {
     });
 
     socket.on("CHAT_MESSAGE", async (data) => {
+      //TODO : check add message to room
       await addMessageToRoom(data);
       socket.to(data.roomId).emit("CHAT_MESSAGE", data);
     });
@@ -95,9 +99,9 @@ const createSocketServer = (server) => {
       // console.log(activeSockets);
     });
 
-    socket.on("CANVAS_DATA", async (data) => {
-      await updateRoomCanvas(data);
-    });
+    // socket.on("CANVAS_DATA", async (data) => {
+    //   await updateRoomCanvas(data);
+    // });
 
     socket.on("error", (data) => console.log(data));
   });

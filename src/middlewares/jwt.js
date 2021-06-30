@@ -7,15 +7,13 @@ export const authorizeUser = async (req, res, next) => {
     const accessToken = req.cookies.accessToken;
 
     const decoded = await verifyAccessToken(accessToken);
-    const user = await UserSchema.findById(decoded._id)
-      .populate({
-        path: "rooms",
+    const user = await UserSchema.findById(decoded._id).populate({
+      path: "rooms",
 
-        populate: {
-          path: "participants",
-        },
-      })
-      
+      populate: {
+        path: "participants",
+      },
+    });
 
     if (!user) {
       throw new Error();
@@ -104,4 +102,34 @@ const verifyRefreshToken = async (token) => {
     const err = new Error("Failed to generate access token");
     next(err);
   }
+};
+
+export const refreshToken = async (oldRefreshToken) => {
+  const decoded = await verifyRefreshToken(oldRefreshToken);
+
+  const user = await UserSchema.findOne({ _id: decoded._id });
+  
+  if (!user) {
+    throw new Error(`Access is forbidden`);
+  }
+  const currentRefreshToken = user.refreshToken.find(
+    (t) => t === oldRefreshToken
+  );
+
+  if (!currentRefreshToken) {
+    throw new Error(`Refresh token is wrong`);
+  }
+
+  const newAccessToken = await generateJWTAccess({ _id: user._id });
+  const newRefreshToken = await generateJWTRefresh({ _id: user._id });
+  console.log(newAccessToken,newRefreshToken);
+  const newRefreshTokens = user.refreshToken
+    .filter((t) => t !== oldRefreshToken)
+    .concat(newRefreshToken );
+
+  user.refreshToken = [...newRefreshTokens];
+
+  await user.save();
+
+  return { accessToken: newAccessToken, refreshToken: newRefreshToken };
 };

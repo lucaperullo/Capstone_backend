@@ -1,7 +1,12 @@
 import jwt from "jsonwebtoken";
 import express from "express";
 import UserModel from "../models/users/schema.js";
-import { authenticateUser, authorizeUser } from "../middlewares/jwt.js";
+import {
+  authenticateUser,
+  authorizeUser,
+  refreshToken,
+} from "../middlewares/jwt.js";
+import { loginWare } from "../middlewares/loginWare.js";
 
 const authRoutes = express.Router();
 
@@ -38,6 +43,34 @@ authRoutes.post("/register", async (req, res, next) => {
     next(error);
   }
 });
+authRoutes.post("/refreshToken", async (req, res, next) => {
+  const oldRefreshToken = req.cookies.refreshToken;
+  if (!oldRefreshToken) {
+    const err = new Error("Refresh token missing");
+    err.httpStatusCode = 400;
+    next(err);
+  } else {
+    try {
+      const newTokens = await refreshToken(oldRefreshToken);
+      if (newTokens) {
+        res.cookie("accessToken", newTokens.accessToken, {
+          httpOnly: true,
+        });
+        res.cookie("refreshToken", newTokens.refreshToken, {
+          httpOnly: true,
+          path: "/refreshToken",
+        });
+        res.status(201).send({ ok: true });
+      } else {
+        const err = new Error("Provided refresh tocken is incorrect");
+        err.httpStatusCode = 403;
+        next(err);
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+});
 
 // authRoutes.post("login", async (req, res, next) => {
 //   try {
@@ -67,14 +100,14 @@ authRoutes.post("/register", async (req, res, next) => {
 //     next(error);
 //   }
 // });
-authRoutes.post("/login", async (req, res, next) => {
+authRoutes.post("/login", loginWare, async (req, res, next) => {
   try {
-    const { username, password } = req.body;
-    console.log(req.body);
-    const user = await UserModel.findByCredentials(username, password);
-    console.log(user);
-    if (user) {
+    if (req.user) {
+      const user = req.user;
       const tokens = await authenticateUser(user);
+      user.refreshToken = [...user.refreshToken, tokens.refreshToken];
+      user.status.presence = "online";
+      user.save();
       res
         .cookie("accessToken", tokens.accessToken, {
           httpOnly: true,
@@ -85,6 +118,7 @@ authRoutes.post("/login", async (req, res, next) => {
           httpOnly: true,
           secure: false, //set to true when deploy
           sameSite: "lax", //set to none when deploy
+          path: "/refreshToken",
         })
         .send({ message: "logged in" });
     } else {
@@ -97,7 +131,13 @@ authRoutes.post("/login", async (req, res, next) => {
 });
 
 authRoutes.post("/logout", authorizeUser, async (req, res, next) => {
+  console.log(req.user);
   try {
+    const user = req.user;
+    user.refreshToken = user.refreshToken.filter((t) => t.token !== req.token);
+    user.status.presence = "offline";
+    user.save();
+
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
     res.status(200).send({ message: "Successfully logged out." });

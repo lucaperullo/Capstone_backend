@@ -5,24 +5,19 @@ export const RoomModel = new mongoose.Schema(
     name: {
       type: String,
     },
+    plalist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Music" }],
     participants: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        socketId: {
+          type: String,
+          unique: true,
+        },
       },
     ],
-    chatHistory: [
-      {
-        senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        text: { type: String },
-        messagePic: { type: String },
-        createdAt: { type: Date },
-        updatedAt: { type: Date },
-      },
-    ],
-    images: {
-      type: String,
-    },
   },
   {
     timestamps: true,

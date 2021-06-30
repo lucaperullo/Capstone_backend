@@ -29,13 +29,27 @@ const UserModel = new mongoose.Schema({
   },
   bio: {
     type: String,
-    default: "Hey there, Im new to OutMusic!",
+    default: "Hey there, Im new to Our-Music!",
   },
   password: {
     type: String,
     required: true,
     minLength: 8,
   },
+  musicHistory: { type: mongoose.Schema.Types.ObjectId, ref: "Music" },
+  status: {
+    music: {
+      type: String,
+      default: "",
+    },
+    presence: {
+      type: String,
+      required: true,
+      default: "offline",
+      enum: ["offline", "online", "busy", "noDisturb"],
+    },
+  },
+  refreshToken:[{ type:String}],
   profilePic: {
     type: String,
     default: "https://i.ibb.co/Fm5L0fZ/user-default.png",

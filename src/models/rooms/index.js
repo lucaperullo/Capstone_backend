@@ -1,14 +1,36 @@
 import express from "express";
 import { authorizeUser } from "../../middlewares/jwt.js";
-
+import multer from "multer";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import RoomSchema from "./schema.js";
 import UserSchema from "../users/schema.js";
 import MessageSchema from "../text/schema.js";
 
+import { v2 as cloudinary } from "cloudinary";
 import sgMail from "@sendgrid/mail";
+
+import { v4 as uid } from "uuid";
+
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    allowed_formats: ["png", "jpg", "gif", "bmp", "jpeg"],
+    folder: "OurMusicImgs",
+    public_id: (req, file) => req.user._id + uid.toString(),
+    // transformation: [
+    //   { width: 600, height: 600, gravity: "face", crop: "fill" },
+    // ],
+  },
+});
+export const CloudinaryMulter = multer({
+  storage: cloudinaryStorage,
+});
 
 const roomRoute = express.Router();
 
+//TODO: Playlist managemement
+
+//Create room when follow a user
 roomRoute.post("/:participantId", authorizeUser, async (req, res, next) => {
   console.log(req.user._id);
   try {
@@ -62,31 +84,39 @@ roomRoute.get("/:id", authorizeUser, async (req, res, next) => {
   }
 });
 
-roomRoute.post("/text-to/:id", authorizeUser, async (req, res, next) => {
-  try {
-    const newMessage = new MessageSchema({
-      senderId: req.user._id,
-      text: req.body.text,
-      messagePic: req.file?.path ? req.file.path : "",
-    });
-    const message = { ...newMessage.toObject() };
-    const room = await RoomSchema.findByIdAndUpdate(
-      req.params.id,
-      {
-        $push: {
-          chatHistory: { ...message },
+roomRoute.post(
+  "/text-to/:id",
+  authorizeUser,
+  CloudinaryMulter.single("messagePic"),
+  // CloudinaryMulter.multiple("messagePics"),
+  async (req, res, next) => {
+    try {
+      //TODO : create cloudinary middleware
+      const newMessage = new MessageSchema({
+        roomId: req.params.id,
+        senderId: req.user._id,
+        text: req.body.text,
+        messagePic: req.file?.path ? req.file.path : "",
+      });
+      const message = { ...newMessage.toObject() };
+      const room = await RoomSchema.findByIdAndUpdate(
+        req.params.id,
+        {
+          $push: {
+            chatHistory: { ...message },
+          },
         },
-      },
-      {
-        runValidators: true,
-        new: true,
-      }
-    );
-    res.status(200).send(room);
-  } catch (error) {
-    console.log(error);
+        {
+          runValidators: true,
+          new: true,
+        }
+      );
+      res.status(200).send(room);
+    } catch (error) {
+      console.log(error);
+    }
   }
-});
+);
 
 //ADD USER TO ROOM AND VIS-VERSA
 roomRoute.put(
