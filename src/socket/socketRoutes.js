@@ -1,6 +1,6 @@
-import  MessageSchema  from "../models/text/schema.js";
-import RoomModel  from "../models/rooms/schema.js";
-import  UserModel  from "../models/users/schema.js";
+import  MessageSchema  from "../routes/text/schema.js";
+import RoomModel  from "../routes/rooms/schema.js";
+import  UserModel  from "../routes/users/schema.js";
 
 export const addUserSocketToRoom = async (data, socketId) => {
   try {

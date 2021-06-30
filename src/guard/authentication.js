@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import express from "express";
-import UserModel from "../models/users/schema.js";
+import UserModel from "../routes/users/schema.js";
 import {
   authenticateUser,
   authorizeUser,

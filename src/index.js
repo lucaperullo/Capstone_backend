@@ -5,14 +5,14 @@ import mongoose from "mongoose";
 import { Server } from "socket.io";
 import { createServer } from "http";
 
-import userRoutes from "./models/users/index.js";
+import userRoutes from "./routes/users/index.js";
 import authRoutes from "./guard/authentication.js";
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import createSocketServer from "./socket/index.js";
 
-import roomsRoute from "./models/rooms/index.js";
+import roomsRoute from "./routes/rooms/index.js";
 import {
   notFoundErrorHandler,
   badRequestErrorHandler,

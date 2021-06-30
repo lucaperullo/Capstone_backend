@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import UserSchema from "../models/users/schema.js";
+import UserSchema from "../routes/users/schema.js";
 
 export const authorizeUser = async (req, res, next) => {
   try {

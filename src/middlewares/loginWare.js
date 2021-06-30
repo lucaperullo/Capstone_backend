@@ -1,4 +1,4 @@
-import UserModel from "../models/users/schema.js";
+import UserModel from "../routes/users/schema.js";
 
 export const loginWare = async (req, res, next) => {
   const { username, password } = req.body;
