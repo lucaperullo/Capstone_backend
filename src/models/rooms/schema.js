@@ -5,7 +5,7 @@ export const RoomModel = new mongoose.Schema(
     name: {
       type: String,
     },
-    plalist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Music" }],
+    playlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Music" }],
     participants: [
       {
         userId: {
