@@ -1,4 +1,4 @@
-import  MessageSchema  from "../routes/text/schema.js";
+import  MessageSchema  from "../routes/messages/schema.js";
 import RoomModel  from "../routes/rooms/schema.js";
 import  UserModel  from "../routes/users/schema.js";
 

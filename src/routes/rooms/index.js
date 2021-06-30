@@ -4,7 +4,7 @@ import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import RoomSchema from "./schema.js";
 import UserSchema from "../users/schema.js";
-import MessageSchema from "../text/schema.js";
+import MessageSchema from "../messages/schema.js";
 
 import { v2 as cloudinary } from "cloudinary";
 import sgMail from "@sendgrid/mail";
