@@ -91,7 +91,6 @@ roomRoute.post(
   // CloudinaryMulter.multiple("messagePics"),
   async (req, res, next) => {
     try {
-      //TODO : create cloudinary middleware
       const newMessage = new MessageSchema({
         roomId: req.params.id,
         senderId: req.user._id,
@@ -114,6 +113,7 @@ roomRoute.post(
       res.status(200).send(room);
     } catch (error) {
       console.log(error);
+      next(error);
     }
   }
 );
@@ -140,31 +140,4 @@ roomRoute.put(
   }
 );
 
-//SEND JOIN EMAIL
-// roomRoute.post(
-//   "/addrequest/:roomId",
-//   authorizeUser,
-//   async (req, res, next) => {
-//     try {
-//       let requestedUser = await UserSchema.findOne({ email: req.body.email });
-//       if (requestedUser) {
-//         sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-//         const msg = {
-//           to: req.body.email,
-//           from: "thepoopatroopa@gmail.com",
-//           subject: "Room Request",
-//           text: "You have been invited",
-//           html: `<strong>You have been invited to a new room. <a href='https://capstone-fe.vercel.app/room/${req.params.roomId}?join=true'>Click here<a/> to join!</strong>`,
-//         };
-//         await sgMail.send(msg);
-//         res.send({ message: "Invite sent!" });
-//       } else {
-//         res.send({ message: "No User with this email found!" });
-//       }
-//     } catch (error) {
-//       console.log(error);
-//       next(error);
-//     }
-//   }
-// );
 export default roomRoute;

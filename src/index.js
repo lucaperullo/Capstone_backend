@@ -13,6 +13,14 @@ import cors from "cors";
 import createSocketServer from "./socket/index.js";
 
 import roomsRoute from "./models/rooms/index.js";
+import {
+  notFoundErrorHandler,
+  badRequestErrorHandler,
+  catchAllErrorHandler,
+  unauthorizedErrorHandler,
+  forbiddenErrorHandler,
+} from "./middlewares/errorHandler.js";
+
 const app = express();
 
 const httpServer = createServer(app);
@@ -33,13 +41,19 @@ app.use("/", authRoutes);
 app.use("/users", userRoutes);
 app.use("/rooms", roomsRoute);
 
+app.use(badRequestErrorHandler);
+app.use(notFoundErrorHandler);
+app.use(unauthorizedErrorHandler);
+app.use(forbiddenErrorHandler);
+app.use(catchAllErrorHandler);
+
 const PORT = process.env.PORT || 7000;
 
 mongoose
   .connect(process.env.MONGO_ATLAS, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    createIndexes: true,
+    // createIndexes: true,
     useFindAndModify: false,
     useCreateIndex: true,
   })
