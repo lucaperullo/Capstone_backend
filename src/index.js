@@ -10,7 +10,7 @@ import authRoutes from "./guard/authentication.js";
 
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import createSocketServer from "./socket/index.js";
+import createSocketServer from "./chat/index.js";
 
 import roomsRoute from "./routes/rooms/index.js";
 import {
