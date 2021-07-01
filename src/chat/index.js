@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 
 import {
-  addMessageToRoom,
+  addMessage,
   addUserSocketToRoom,
   getUsersInRoom,
   removeUserSocketFromRoom,
@@ -38,14 +38,6 @@ const createSocketServer = (server) => {
         await addUserSocketToRoom(data, socket.id);
         //TODO : update user socketId
 
-        const onlineMessage = {
-          sender: "Our-Music",
-          text: `${data.username} is now online`,
-          createdAt: new Date(),
-        };
-
-        socket.broadcast.emit("CHAT_MESSAGE", onlineMessage);
-
         const userList = await getUsersInRoom(data.roomId);
         io.to(socket.id).emit("roomData", {
           room: data.roomId,
@@ -73,7 +65,7 @@ const createSocketServer = (server) => {
           createdAt: new Date(),
         };
 
-        socket.to(data.roomId).emit("CHAT_MESSAGE", offlineMessage);
+        socket.to(data.roomId).emit("USER_QUIT", offlineMessage);
 
         const userList = await getUsersInRoom(data.roomId);
         io.to(data.roomId).emit("roomData", {
@@ -84,19 +76,24 @@ const createSocketServer = (server) => {
         console.log(error);
       }
     });
+    // socket.on("SEND_IMAGE", async (data) => {
 
-    socket.on("CHAT_MESSAGE", async (data) => {
-      //TODO : check add message to room
-      await addMessageToRoom(data);
-      socket.to(data.roomId).emit("CHAT_MESSAGE", data);
+    // });
+    socket.on("SEND_MESSAGE", async (data) => {
+      const message = {
+        roomId: data.roomId,
+        senderId: data.senderId,
+        text: data.text,
+      };
+      await addMessage(message);
+      console.log(message);
+      socket.to(message.roomId).emit("RECIVE_MESSAGE", message);
     });
     socket.on("LAST_SEEN", ({ userID }) => {
-      // console.log(userID);
       activeSockets = activeSockets.filter((u) => u.userId !== userID);
       activeSockets.push({ userId: userID, socketId: socket.id });
 
       io.sockets.emit("getUsers", activeSockets);
-      // console.log(activeSockets);
     });
 
     // socket.on("CANVAS_DATA", async (data) => {

@@ -1502,6 +1502,11 @@ qs@6.7.0:
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.7.0.tgz#41dc1a015e3d581f1621776be31afb2876a9b1bc"
   integrity sha512-VCdBRNFTX1fyE7Nb6FYoURo/SPe62QCaAyzJvUjwRaIsc+NePBEniHlvxFmmX56+HZphIGtV0XeCirBtpDrTyQ==
 
+query-to-mongo@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/query-to-mongo/-/query-to-mongo-0.10.1.tgz#7bc3349edd5f7adcf121ac0e0158e52451b8e9b9"
+  integrity sha512-928tQp141bsSxQbs7cE/GMgQ2PXL7rsN5tvzA2J2OFuC4u93HzMIdAe/Ga0aoa1bRu/vFaIrgE2OfAQK5BwUbg==
+
 range-parser@~1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.1.tgz#3cf37023d199e1c24d1a55b84800c2f3e6468031"

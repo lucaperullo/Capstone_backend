@@ -1,6 +1,6 @@
-import  MessageSchema  from "../routes/messages/schema.js";
-import RoomModel  from "../routes/rooms/schema.js";
-import  UserModel  from "../routes/users/schema.js";
+import MessageModel from "../routes/messages/schema.js";
+import RoomModel from "../routes/rooms/schema.js";
+import UserModel from "../routes/users/schema.js";
 
 export const addUserSocketToRoom = async (data, socketId) => {
   try {
@@ -39,18 +39,14 @@ export const getUsersInRoom = async (roomId) => {
   }
 };
 
-export const addMessageToRoom = async (data) => {
+export const addMessage = async (data) => {
   try {
-    await RoomModel.findByIdAndUpdate(data.roomId, {
-      $push: {
-        chatHistory: {
-          sender: data.sender,
-          text: data.text,
-          createdAt: data.createdAt,
-          attachment: data.attachment,
-        },
-      },
+    const newMessage = await new MessageModel({
+      roomId: data.roomId,
+      senderId: data.senderId,
+      text: data.text,
     });
+    newMessage.save();
   } catch (error) {
     console.log(error);
   }

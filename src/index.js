@@ -20,6 +20,7 @@ import {
   unauthorizedErrorHandler,
   forbiddenErrorHandler,
 } from "./middlewares/errorHandler.js";
+import messageRoutes from "./routes/messages/index.js";
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use(cookieParser());
 // routes
 app.use("/", authRoutes);
 app.use("/users", userRoutes);
+app.use("/messages", messageRoutes);
 app.use("/rooms", roomsRoute);
 
 app.use(badRequestErrorHandler);

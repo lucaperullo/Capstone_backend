@@ -1,20 +1,49 @@
 import express from "express";
 import UserSchema from "./schema.js";
+import { createRooms } from "../../chat/utilities.js";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import jwt from "jsonwebtoken";
 
 import axios from "axios";
-import { authorizeUser} from "../../middlewares/jwt.js";
+import { authorizeUser } from "../../middlewares/jwt.js";
 
 const userRoutes = express.Router();
 
-
 userRoutes.get("/me", authorizeUser, async (req, res, next) => {
   try {
-    const user = await UserSchema.findById(req.user._id).populate("rooms");
+    const user = await UserSchema.findById(req.user._id);
+
     res.send(user);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+userRoutes.put("/follow/:userId", authorizeUser, async (req, res, next) => {
+  try {
+    const actualUser = req.user;
+    const userToFollow = await UserSchema.findById(req.params.userId);
+
+    if (actualUser.contacts.includes(userToFollow._id)) {
+      actualUser.contacts = actualUser.contacts.filter(
+        (u) => u.toString() !== userToFollow._id.toString()
+      );
+
+      actualUser.save();
+      res.status(200).send({ message: "user unfollowed" });
+    } else {
+      actualUser.contacts = [...actualUser.contacts, userToFollow._id];
+      const roomIdx = await createRooms(actualUser._id, userToFollow._id);
+      console.log(roomIdx);
+      userToFollow.rooms = [...userToFollow.rooms, roomIdx];
+      actualUser.rooms = [...actualUser.rooms, roomIdx];
+      await actualUser.save();
+      await userToFollow.save();
+      res.status(200).send({ message: "user followed" });
+    }
   } catch (error) {
     console.log(error);
     next(error);

@@ -7,13 +7,16 @@ export const authorizeUser = async (req, res, next) => {
     const accessToken = req.cookies.accessToken;
 
     const decoded = await verifyAccessToken(accessToken);
-    const user = await UserSchema.findById(decoded._id).populate({
-      path: "rooms",
-
-      populate: {
-        path: "participants",
-      },
-    });
+    const user = await UserSchema.findById(decoded._id)
+      .populate("rooms")
+      .populate({
+        path: "rooms",
+        populate: {
+          path: "participants.userId",
+          model: "User",
+          select: ["bio", "profilePic", "username", "status", "_id"],
+        },
+      });
 
     if (!user) {
       throw new Error();
@@ -108,7 +111,7 @@ export const refreshToken = async (oldRefreshToken) => {
   const decoded = await verifyRefreshToken(oldRefreshToken);
 
   const user = await UserSchema.findOne({ _id: decoded._id });
-  
+
   if (!user) {
     throw new Error(`Access is forbidden`);
   }
@@ -122,10 +125,10 @@ export const refreshToken = async (oldRefreshToken) => {
 
   const newAccessToken = await generateJWTAccess({ _id: user._id });
   const newRefreshToken = await generateJWTRefresh({ _id: user._id });
-  console.log(newAccessToken,newRefreshToken);
+  console.log(newAccessToken, newRefreshToken);
   const newRefreshTokens = user.refreshToken
     .filter((t) => t !== oldRefreshToken)
-    .concat(newRefreshToken );
+    .concat(newRefreshToken);
 
   user.refreshToken = [...newRefreshTokens];
 

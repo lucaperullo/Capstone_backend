@@ -1,10 +1,8 @@
 import mongoose from "mongoose";
 
-export const RoomModel = new mongoose.Schema(
+const RoomModel = new mongoose.Schema(
   {
-    name: {
-      type: String,
-    },
+
     playlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Music" }],
     participants: [
       {
