@@ -24,13 +24,13 @@ authRoutes.post("/register", async (req, res, next) => {
       res
         .cookie("accessToken", tokens.accessToken, {
           httpOnly: true,
-          secure: false, //set to true when deploy
-          sameSite: "lax", //set to lax when deploy
+          secure: true, //set to true when deploy
+          sameSite: "none", //set to none when deploy
         })
         .cookie("refreshToken", tokens.refreshToken, {
           httpOnly: true,
-          secure: false, //set to true when deploy
-          sameSite: "lax", //set to none when deploy
+          secure: true, //set to true when deploy
+          sameSite: "none", //set to none when deploy
         })
         .send({ message: "logged in" });
       res.status(201).send({
@@ -111,13 +111,13 @@ authRoutes.post("/login", loginWare, async (req, res, next) => {
       res
         .cookie("accessToken", tokens.accessToken, {
           httpOnly: true,
-          secure: false, //set to true when deploy
-          sameSite: "lax", //set to none when deploy
+          secure: true, //set to true when deploy
+          sameSite: "none", //set to none when deploy
         })
         .cookie("refreshToken", tokens.refreshToken, {
           httpOnly: true,
-          secure: false, //set to true when deploy
-          sameSite: "lax", //set to none when deploy
+          secure: true, //set to true when deploy
+          sameSite: "none", //set to none when deploy
           path: "/refreshToken",
         })
         .send({ message: "logged in" });

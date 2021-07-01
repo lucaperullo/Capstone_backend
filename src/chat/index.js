@@ -14,7 +14,7 @@ const createSocketServer = (server) => {
   const io = new Server(server, {
     allowEIO3: true,
     cors: {
-      origin: "http://localhost:3000",
+      origin: ["http://localhost:3000", "https://capstone-tau.vercel.app"],
       methods: ["GET, POST, PUT, DELETE"],
     },
   });
