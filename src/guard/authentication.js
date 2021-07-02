@@ -55,10 +55,12 @@ authRoutes.post("/refreshToken", async (req, res, next) => {
       if (newTokens) {
         res.cookie("accessToken", newTokens.accessToken, {
           httpOnly: true,
+          sameSite: "none", //set to none when deploy
           secure: true,
         });
         res.cookie("refreshToken", newTokens.refreshToken, {
           httpOnly: true,
+          sameSite: "none", //set to none when deploy
           secure: true,
           path: "/refreshToken",
         });
