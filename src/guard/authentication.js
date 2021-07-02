@@ -55,9 +55,11 @@ authRoutes.post("/refreshToken", async (req, res, next) => {
       if (newTokens) {
         res.cookie("accessToken", newTokens.accessToken, {
           httpOnly: true,
+          secure: true,
         });
         res.cookie("refreshToken", newTokens.refreshToken, {
           httpOnly: true,
+          secure: true,
           path: "/refreshToken",
         });
         res.status(201).send({ ok: true });
