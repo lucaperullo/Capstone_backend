@@ -72,34 +72,6 @@ authRoutes.post("/refreshToken", async (req, res, next) => {
   }
 });
 
-// authRoutes.post("login", async (req, res, next) => {
-//   try {
-//     const user = await UserModel.find({
-//       $and: [
-//         {
-//           $or: [{ username: req.body.username }, { email: req.body.username }],
-//         },
-//         { password: req.body.password },
-//       ],
-//     });
-//     if (user.length === 1) {
-//       const access_token = await jwt.sign(
-//         { sub: user },
-//         process.env.JWT_ACCESS_TOKEN
-//       );
-//       return res.json({
-//         status: true,
-//         message: "login success",
-//         data: { access_token },
-//       });
-//     } else {
-//       res.status(404).send("User not found");
-//     }
-//   } catch (error) {
-//     console.log(error);
-//     next(error);
-//   }
-// });
 authRoutes.post("/login", loginWare, async (req, res, next) => {
   try {
     if (req.user) {
@@ -152,19 +124,13 @@ authRoutes.get("/users", authorizeUser, async (req, res, next) => {
     if (req.query.name) {
       const filteredUsers = await UserModel.find({
         username: { $regex: `.*${req.query.name}.*` },
-      }).populate("rooms");
+      });
       res.send(filteredUsers);
     } else {
-      const allUsers = await UserModel.find()
-        .populate("rooms")
-        .populate({
-          path: "rooms",
+      const allUsers = await UserModel.find().select(
+        "-contacts -rooms -email -phone -refreshToken"
+      );
 
-          populate: {
-            path: "participants",
-          },
-        })
-        .exec();
       res.send(allUsers);
     }
   } catch (error) {
