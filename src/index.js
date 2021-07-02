@@ -28,7 +28,7 @@ const httpServer = createServer(app);
 
 createSocketServer(httpServer);
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://capstone-tau.vercel.app"],
+  origin: ["http://localhost", "https://capstone-tau.vercel.app"],
   credentials: true,
   // exposedHeaders: ["set-cookie"],
 };
