@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 const RoomModel = new mongoose.Schema(
   {
-
     playlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Music" }],
     participants: [
       {
@@ -12,7 +11,6 @@ const RoomModel = new mongoose.Schema(
         },
         socketId: {
           type: String,
-          unique: true,
         },
       },
     ],

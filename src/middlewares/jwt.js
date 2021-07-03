@@ -4,6 +4,7 @@ import UserSchema from "../routes/users/schema.js";
 
 export const authorizeUser = async (req, res, next) => {
   try {
+    console.log(req.cookies);
     const accessToken = req.cookies.accessToken;
 
     const decoded = await verifyAccessToken(accessToken);

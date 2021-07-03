@@ -24,13 +24,13 @@ authRoutes.post("/register", async (req, res, next) => {
       res
         .cookie("accessToken", tokens.accessToken, {
           httpOnly: true,
-          secure: true, //set to true when deploy
-          sameSite: "none", //set to none when deploy
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+          secure: process.env.NODE_ENV === "production" ? true : false,
         })
         .cookie("refreshToken", tokens.refreshToken, {
           httpOnly: true,
-          secure: true, //set to true when deploy
-          sameSite: "none", //set to none when deploy
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+          secure: process.env.NODE_ENV === "production" ? true : false,
         })
         .send({ message: "logged in" });
       res.status(201).send({
@@ -55,13 +55,13 @@ authRoutes.post("/refreshToken", async (req, res, next) => {
       if (newTokens) {
         res.cookie("accessToken", newTokens.accessToken, {
           httpOnly: true,
-          sameSite: "none", //set to none when deploy
-          secure: true,
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+          secure: process.env.NODE_ENV === "production" ? true : false,
         });
         res.cookie("refreshToken", newTokens.refreshToken, {
           httpOnly: true,
-          sameSite: "none", //set to none when deploy
-          secure: true,
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+          secure: process.env.NODE_ENV === "production" ? true : false,
           path: "/refreshToken",
         });
         res.status(201).send({ ok: true });
@@ -87,13 +87,13 @@ authRoutes.post("/login", loginWare, async (req, res, next) => {
       res
         .cookie("accessToken", tokens.accessToken, {
           httpOnly: true,
-          secure: true, //set to true when deploy
-          sameSite: "none", //set to none when deploy
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+          secure: process.env.NODE_ENV === "production" ? true : false,
         })
         .cookie("refreshToken", tokens.refreshToken, {
           httpOnly: true,
-          secure: true, //set to true when deploy
-          sameSite: "none", //set to none when deploy
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+          secure: process.env.NODE_ENV === "production" ? true : false,
           path: "/refreshToken",
         })
         .send({ message: "logged in" });
