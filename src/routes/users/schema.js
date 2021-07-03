@@ -27,6 +27,19 @@ const UserModel = new mongoose.Schema({
       "Please fill a valid email address",
     ],
   },
+  appTheming: {
+    theme: {
+      type: Boolean,
+      default: true,
+    },
+    backgroundColor: {
+      type: String,
+    },
+    backgroundImage: {
+      type: String,
+    },
+    bubbleChat: { type: String, default: "primary" },
+  },
   bio: {
     type: String,
     default: "Hey there, Im new to Our-Music!",
@@ -49,7 +62,7 @@ const UserModel = new mongoose.Schema({
       enum: ["offline", "online", "busy", "noDisturb"],
     },
   },
-  refreshToken:[{ type:String}],
+  refreshToken: [{ type: String }],
   profilePic: {
     type: String,
     default: "https://i.ibb.co/Fm5L0fZ/user-default.png",
