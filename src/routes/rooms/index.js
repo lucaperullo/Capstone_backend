@@ -35,7 +35,6 @@ roomRoute.post("/:participantId", authorizeUser, async (req, res, next) => {
   console.log(req.user._id);
   try {
     const newRoom = await new RoomSchema({
-      name: req.body.name,
       participants: [req.params.participantId, req.user._id],
     });
 
