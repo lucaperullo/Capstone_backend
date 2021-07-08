@@ -28,7 +28,11 @@ const httpServer = createServer(app);
 
 createSocketServer(httpServer);
 const corsOptions = {
-  origin: ["http://localhost", "https://capstone-tau.vercel.app"],
+  origin: [
+    "http://localhost",
+    "http://localhost:3000",
+    "https://capstone-tau.vercel.app",
+  ],
   credentials: true,
   // exposedHeaders: ["set-cookie"],
 };
@@ -48,6 +52,8 @@ app.use(notFoundErrorHandler);
 app.use(unauthorizedErrorHandler);
 app.use(forbiddenErrorHandler);
 app.use(catchAllErrorHandler);
+
+// SPOTIFY LOGIN
 
 const PORT = process.env.PORT || 7000;
 

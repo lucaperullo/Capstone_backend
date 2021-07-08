@@ -27,6 +27,7 @@
     "multer-storage-cloudinary": "^4.0.0",
     "query-to-mongo": "^0.10.1",
     "socket.io": "^4.1.2",
+    "spotify-web-api-node": "^5.0.2",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
