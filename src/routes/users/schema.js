@@ -12,20 +12,14 @@ const UserModel = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  phone: {
+  spotifyId: {
     type: String,
     unique: true,
-    minLength: 10,
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    validate: [validateEmail, "Please fill a valid email address"],
-    match: [
-      /^\w+([.-]?\w+)@\w+([.-]?\w+)(.\w{2,3})+$/,
-      "Please fill a valid email address",
-    ],
+  spotifyTokens: {
+    access_token: String,
+    refresh_token: String,
+    expires_in:Number
   },
   appTheming: {
     theme: {

@@ -41,6 +41,7 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
+
 // routes
 app.use("/", authRoutes);
 app.use("/users", userRoutes);
@@ -52,8 +53,6 @@ app.use(notFoundErrorHandler);
 app.use(unauthorizedErrorHandler);
 app.use(forbiddenErrorHandler);
 app.use(catchAllErrorHandler);
-
-// SPOTIFY LOGIN
 
 const PORT = process.env.PORT || 7000;
 

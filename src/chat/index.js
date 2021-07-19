@@ -24,7 +24,6 @@ const createSocketServer = (server) => {
   });
 
   io.on("connection", (socket) => {
-    console.log("new connection:", socket.id);
     socket.on("isOnline", ({ userID }) => {
       // console.log(userID);
       activeSockets = activeSockets.filter((u) => u.userId !== userID);
@@ -36,7 +35,6 @@ const createSocketServer = (server) => {
     //REMEMBER ME : join all the rooms async when the user logs in
     socket.on("JOIN_ROOM", async (data) => {
       try {
-        console.log({ JOINROOM: data });
         socket.join(data.roomId);
 
         await addUserSocketToRoom(data, socket.id);
@@ -49,7 +47,7 @@ const createSocketServer = (server) => {
         });
         //TODO check function get user in room
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     });
 
@@ -77,7 +75,7 @@ const createSocketServer = (server) => {
           list: userList,
         });
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     });
     // socket.on("SEND_IMAGE", async (data) => {
@@ -104,10 +102,10 @@ const createSocketServer = (server) => {
     //   await updateRoomCanvas(data);
     // });
 
-    socket.on("error", (data) => console.log(data));
+    // socket.on("error", (data) => console.log(data));
   });
 
-  io.on("error", (data) => console.log(data));
+  // io.on("error", (data) => console.log(data));
 };
 
 export default createSocketServer;

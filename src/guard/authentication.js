@@ -8,41 +8,244 @@ import {
 } from "../middlewares/jwt.js";
 import { loginWare } from "../middlewares/loginWare.js";
 
-const authRoutes = express.Router();
+import SpotifyWebApi from "spotify-web-api-node";
 
-authRoutes.post("/register", async (req, res, next) => {
+const authRoutes = express.Router();
+// const SpotifyStrategy = passportSpotify.Strategy;
+//TODO: set up passportSpotify
+//TODO: get user playlist on login
+//TODO: add roles for groups
+//TODO: share timing of the que of songs currently playing to allow to listen togheter the same song
+const spotifyApi = new SpotifyWebApi({
+  redirectUri: process.env.REDIRECT_URI,
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+});
+const scopes =
+  "ugc-image-upload user-read-recently-played user-read-playback-state user-top-read playlist-modify-public user-modify-playback-state playlist-modify-private user-follow-modify user-read-currently-playing user-follow-read user-library-modify user-read-playback-position playlist-read-private user-read-private user-library-read playlist-read-collaborative streaming";
+
+authRoutes.get("/login/spotify", async (req, res, next) => {
   try {
-    const newUser = await UserModel.create(req.body);
-    if (newUser) {
-      const tokens = await authenticateUser(newUser);
-      const username = req.body.username;
-      const email = req.body.email;
-      const access_token = await jwt.sign(
-        { sub: newUser._id },
-        process.env.JWT_ACCESS_TOKEN
-      );
-      res
-        .cookie("accessToken", tokens.accessToken, {
-          httpOnly: true,
-          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
-          secure: process.env.NODE_ENV === "production" ? true : false,
-        })
-        .cookie("refreshToken", tokens.refreshToken, {
-          httpOnly: true,
-          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
-          secure: process.env.NODE_ENV === "production" ? true : false,
-        })
-        .send({ message: "logged in" });
-      res.status(201).send({
-        message: `User created with this ID => ${newUser._id}`,
-        access_token: `${access_token}`,
-      });
-    }
+    res.redirect(
+      "https://accounts.spotify.com/authorize" +
+        "?response_type=code" +
+        "&client_id=" +
+        process.env.CLIENT_ID +
+        (scopes && "&scope=" + encodeURIComponent(scopes)) +
+        "&redirect_uri=" +
+        encodeURIComponent(process.env.REDIRECT_URI)
+    );
   } catch (error) {
     console.log(error);
     next(error);
   }
 });
+
+authRoutes.post("/login/spotify/callback", async (req, res, next) => {
+  const code = await req.body.code;
+  if (code !== undefined) {
+    try {
+      console.log("THIS IS CODE", code);
+      const data = await spotifyApi.authorizationCodeGrant(code);
+      spotifyApi.setAccessToken(data.body.access_token);
+      let user = await spotifyApi.getMe();
+      user = user.body;
+      const generatedUser = {
+        spotifyId: user.id,
+        username: user.display_name,
+        password: user.id,
+        profilePic: user.images[0].url,
+      };
+
+      const existingUser = await UserModel.findOne({
+        username: generatedUser.username,
+      });
+      if (existingUser && existingUser.username.length > 0) {
+        console.log({ this_is_blabla1: existingUser });
+        const tokens = await authenticateUser(existingUser);
+        console.log({ EXISTING: tokens });
+        let existing = true;
+        if (existing) {
+          res.cookie("accessToken", tokens.accessToken, {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+            secure: process.env.NODE_ENV === "production" ? true : false,
+          });
+          res.cookie("refreshToken", tokens.refreshToken, {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+            secure: process.env.NODE_ENV === "production" ? true : false,
+          });
+          res.send({
+            refreshToken: data.body.refresh_token,
+            accessToken: data.body.access_token,
+            expiresIn: data.body.expires_in,
+          });
+          return
+        }
+
+        //
+      } else {
+        console.log({ this_is_blabla2: existingUser });
+        const newUser = await UserModel.create(generatedUser);
+        const tokens = await authenticateUser(newUser);
+        console.log({ WASnotEXISTING: tokens });
+
+        res.cookie("accessToken", tokens.accessToken, {
+          httpOnly: true,
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+          secure: process.env.NODE_ENV === "production" ? true : false,
+        });
+        res.cookie("refreshToken", tokens.refreshToken, {
+          httpOnly: true,
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+          secure: process.env.NODE_ENV === "production" ? true : false,
+        });
+        res.send({
+          refreshToken: data.body.refresh_token,
+          accessToken: data.body.access_token,
+          expiresIn: data.body.expires_in,
+        });
+        return;
+      }
+    } catch (error) {
+      console.log("Something went wrong!", error);
+    }
+  }
+});
+// authRoutes.post("/login/spotify", async (req, res, next) => {
+//   try {
+//     const code = req.body.code;
+
+//     const spotifyApi = new SpotifyWebApi({
+//       redirectUri: process.env.REDIRECT_URI,
+//       clientId: process.env.CLIENT_ID,
+//       clientSecret: process.env.CLIENT_SECRET,
+//     });
+
+//     const data = await spotifyApi.authorizationCodeGrant(code);
+//     const SPOTIFYaccessToken = data.body.access_token;
+//     const SPOTIFYrefreshToken = data.body.refresh_token;
+//     const SPOTIFYexpiresIn = data.body.expires_in;
+
+//     if (data) {
+//       spotifyApi.setAccessToken(SPOTIFYaccessToken);
+//       const user = await spotifyApi.getMe();
+
+//       const spotiUser = user.body;
+//       if (spotiUser) {
+//         try {
+//           const generatedUser = {
+//             spotifyId: spotiUser.id,
+//             username: spotiUser.display_name,
+//             password: spotiUser.id,
+//             profilePic: spotiUser.images[0].url,
+//           };
+
+//           const existingUser = await UserModel.findOne({
+//             username: generatedUser.username,
+//           });
+//           if (existingUser && existingUser.username.length > 0) {
+//             console.log({ this_is_blabla1: existingUser });
+//             const tokens = await authenticateUser(existingUser);
+//             console.log({ EXISTING: tokens });
+//             res.cookie("accessToken", tokens.accessToken, {
+//               httpOnly: true,
+//               sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+//               secure: process.env.NODE_ENV === "production" ? true : false,
+//             });
+//             res.cookie("refreshToken", tokens.refreshToken, {
+//               httpOnly: true,
+//               sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+//               secure: process.env.NODE_ENV === "production" ? true : false,
+//             });
+//             res.send({
+//               refreshToken: SPOTIFYrefreshToken,
+//               accessToken: SPOTIFYaccessToken,
+//               expiresIn: SPOTIFYexpiresIn,
+//             });
+//             //
+//           } else {
+//             console.log({ this_is_blabla2: existingUser });
+//             const newUser = await UserModel.create(generatedUser);
+//             const tokens = await authenticateUser(newUser);
+//             console.log({ WASnotEXISTING: tokens });
+
+//             res.cookie("accessToken", tokens.accessToken, {
+//               httpOnly: true,
+//               sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+//               secure: process.env.NODE_ENV === "production" ? true : false,
+//             });
+//             res.cookie("refreshToken", tokens.refreshToken, {
+//               httpOnly: true,
+//               sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+//               secure: process.env.NODE_ENV === "production" ? true : false,
+//             });
+//             res.send({
+//               refreshToken: SPOTIFYrefreshToken,
+//               accessToken: SPOTIFYaccessToken,
+//               expiresIn: SPOTIFYexpiresIn,
+//             });
+//           }
+//         } catch (error) {
+//           next(error);
+//         }
+//       }
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+// authRoutes.post("/register", async (req, res, next) => {
+//   const code = req.body.code;
+//   const spotifyApi = await new SpotifyWebApi({
+//     redirectUri: process.env.REDIRECT_URI,
+//     clientId: process.env.CLIENT_ID,
+//     clientSecret: process.env.CLIENT_SECRET,
+//   });
+//   // console.log(code);
+//   const data = await spotifyApi.authorizationCodeGrant(code);
+//   const accessToken = data.body.access_token;
+//   const refreshToken = data.body.refresh_token;
+//   const expiresIn = data.body.expires_in;
+//   if (data) {
+//     await spotifyApi.setAccessToken(accessToken);
+//     const user = await spotifyApi.getMe();
+//     const spotiUser = user.body;
+//     console.log(spotiUser);
+//     const generatedUser = {
+//       username: spotiUser.display_name,
+//       password: spotiUser.id,
+//       profilePic: spotiUser.images[0],
+//     };
+//     try {
+//       const newUser = await UserModel.create(generatedUser);
+//       if (newUser) {
+//         const tokens = await authenticateUser(newUser);
+
+//         const access_token = await jwt.sign(
+//           { sub: newUser._id },
+//           process.env.JWT_ACCESS_TOKEN
+//         );
+//         res
+//           .cookie("accessToken", tokens.accessToken, {
+//             httpOnly: true,
+//             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+//             secure: process.env.NODE_ENV === "production" ? true : false,
+//           })
+//           .cookie("refreshToken", tokens.refreshToken, {
+//             httpOnly: true,
+//             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
+//             secure: process.env.NODE_ENV === "production" ? true : false,
+//           })
+//           .send({ message: "logged in" });
+//       }
+//     } catch (error) {
+//       // console.log(error);
+//       next(error);
+//     }
+//   }
+// });
 authRoutes.post("/refreshToken", async (req, res, next) => {
   const oldRefreshToken = req.cookies.refreshToken;
   if (!oldRefreshToken) {
@@ -101,7 +304,7 @@ authRoutes.post("/login", loginWare, async (req, res, next) => {
       res.status(404).send({ message: "No user found!" });
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     next(error);
   }
 });

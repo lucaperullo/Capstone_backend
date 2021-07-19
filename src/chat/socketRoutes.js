@@ -12,7 +12,7 @@ export const addUserSocketToRoom = async (data, socketId) => {
       { "partecipants.$.socketId": socketId }
     );
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };
 
@@ -26,7 +26,7 @@ export const removeUserSocketFromRoom = async (data) => {
       { "partecipants.$.socketId": "" }
     );
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };
 
@@ -35,7 +35,7 @@ export const getUsersInRoom = async (roomId) => {
     const room = await RoomModel.findById(roomId);
     return room.partecipants;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };
 
@@ -48,7 +48,7 @@ export const addMessage = async (data) => {
     });
     newMessage.save();
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };
 
@@ -58,6 +58,6 @@ export const updateRoomCanvas = async (data) => {
       images: data.canvasData,
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };

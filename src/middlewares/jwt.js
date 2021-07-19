@@ -4,7 +4,7 @@ import UserSchema from "../routes/users/schema.js";
 
 export const authorizeUser = async (req, res, next) => {
   try {
-    console.log(req.cookies);
+    console.log({ hi: req.cookies });
     const accessToken = req.cookies.accessToken;
 
     const decoded = await verifyAccessToken(accessToken);
@@ -34,7 +34,9 @@ export const authorizeUser = async (req, res, next) => {
 export const authenticateUser = async (user) => {
   try {
     const newAccessToken = await generateJWTAccess({ _id: user._id });
+    console.log(newAccessToken);
     const newRefreshToken = await generateJWTRefresh({ _id: user._id });
+    console.log(newRefreshToken);
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   } catch (error) {
     console.log(error);
@@ -43,6 +45,7 @@ export const authenticateUser = async (user) => {
 };
 
 const generateJWTAccess = async (payload) => {
+  console.log({ hi2: payload });
   try {
     const accessToken = await jwt.sign(payload, process.env.JWT_ACCESS_TOKEN, {
       expiresIn: "1d",
@@ -79,6 +82,7 @@ const generateJWTRefresh = async (payload) => {
 };
 
 const verifyAccessToken = async (token) => {
+  console.log(token);
   try {
     const decodedToken = await jwt.verify(token, process.env.JWT_ACCESS_TOKEN);
     if (!decodedToken) {
@@ -86,12 +90,13 @@ const verifyAccessToken = async (token) => {
     }
     return decodedToken;
   } catch (error) {
-    console.log(error);
+    console.log({ heyitserror: error });
     throw new Error("Failed to generate access token");
   }
 };
 
 const verifyRefreshToken = async (token) => {
+  console.log(token);
   try {
     const decodedToken = await jwt.verify(
       token,
@@ -102,7 +107,7 @@ const verifyRefreshToken = async (token) => {
     }
     return decodedToken;
   } catch (error) {
-    console.log(error);
+    console.log({ heyitserror2: error });
     const err = new Error("Failed to generate refresh token");
     next(err);
   }
