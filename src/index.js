@@ -1,7 +1,7 @@
 import express from "express";
 import listEndpoints from "express-list-endpoints";
 import mongoose from "mongoose";
-
+import passport from "./utils/passport.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
 
@@ -21,6 +21,7 @@ import {
   forbiddenErrorHandler,
 } from "./middlewares/errorHandler.js";
 import messageRoutes from "./routes/messages/index.js";
+import spotifyRoutes from "./services/auth.js";
 
 const app = express();
 
@@ -38,16 +39,18 @@ const corsOptions = {
 };
 // app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(cors(corsOptions));
+app.use(passport.initialize());
 
 app.use(express.json());
 app.use(cookieParser());
 
 // routes
+
 app.use("/", authRoutes);
 app.use("/users", userRoutes);
 app.use("/messages", messageRoutes);
 app.use("/rooms", roomsRoute);
-
+app.use("/spotify", spotifyRoutes);
 app.use(badRequestErrorHandler);
 app.use(notFoundErrorHandler);
 app.use(unauthorizedErrorHandler);

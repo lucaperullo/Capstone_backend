@@ -12,6 +12,7 @@ const UserModel = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  country: String,
   spotifyId: {
     type: String,
     unique: true,
@@ -19,8 +20,17 @@ const UserModel = new mongoose.Schema({
   spotifyTokens: {
     access_token: String,
     refresh_token: String,
-    expires_in:Number
+    expires_in: String,
   },
+  playlists: {
+    userPlaylists: {
+      items: [],
+    },
+    next: String,
+    previous: String,
+    total: Number,
+  },
+  uri: String,
   appTheming: {
     theme: {
       type: Boolean,
@@ -46,8 +56,8 @@ const UserModel = new mongoose.Schema({
   musicHistory: { type: mongoose.Schema.Types.ObjectId, ref: "Music" },
   status: {
     music: {
-      type: String,
-      default: "",
+      currentTrack: Number,
+      tracks: [],
     },
     presence: {
       type: String,
