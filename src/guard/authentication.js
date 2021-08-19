@@ -12,8 +12,7 @@ import SpotifyWebApi from "spotify-web-api-node";
 
 const authRoutes = express.Router();
 // const SpotifyStrategy = passportSpotify.Strategy;
-//TODO: set up passportSpotify
-//TODO: get user playlist on login
+
 //TODO: add roles for groups
 //TODO: share timing of the que of songs currently playing to allow to listen togheter the same song
 const spotifyApi = new SpotifyWebApi({
@@ -55,10 +54,7 @@ authRoutes.post("/refreshToken", async (req, res, next) => {
   }
 });
 
-
-
 authRoutes.post("/logout", authorizeUser, async (req, res, next) => {
-  console.log(req.user);
   try {
     const user = req.user;
     user.refreshToken = user.refreshToken.filter((t) => t.token !== req.token);

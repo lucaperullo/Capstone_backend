@@ -122,8 +122,6 @@ roomRoute.put(
   "/:roomId/add-user/:userId",
   authorizeUser,
   async (req, res, next) => {
-    console.log(req.user._id);
-    console.log(req.params.userId);
     try {
       if (req.user._id.toString() === req.params.userId) {
         await RoomSchema.addUserToRoom(req.params.userId, req.params.roomId);

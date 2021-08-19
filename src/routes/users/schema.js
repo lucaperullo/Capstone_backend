@@ -30,7 +30,6 @@ const UserModel = new mongoose.Schema({
     previous: String,
     total: Number,
   },
-  uri: String,
   appTheming: {
     theme: {
       type: Boolean,

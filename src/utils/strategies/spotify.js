@@ -46,64 +46,57 @@ const spotifyApi = new SpotifyStrategy(
      */
     try {
       api.setAccessToken(accessToken);
-      console.log(profile);
+
       const playlistsData = await api.getUserPlaylists(profile.username);
       const playlists = playlistsData?.body?.items;
 
-      if (playlists !== undefined) {
-        if (profile.id !== undefined) {
-          const proPic = profile.photos[0]?.value;
-          const generatedUser = {
-            spotifyId: profile.id,
-            username: profile.displayName,
-            country: profile.country,
-            password: profile.id,
-            profilePic: proPic !== undefined ? profile.photos[0]?.value : "",
-            spotifyTokens: {
-              access_token: accessToken,
-              refresh_token: refreshToken,
-              expires_in: expires_in,
-            },
-            uri: playlistsData.body.items[0].uri,
-            playlists: {
-              userPlaylists: {
-                items: playlists,
-              },
-              next: playlistsData.body.next,
-              previous: playlistsData.body.previous,
-              total: playlistsData.body.total,
-            },
-          };
+      if (profile) {
+        const proPic = profile.photos[0]?.value;
+        const generatedUser = {
+          spotifyId: profile.id,
+          username: profile.displayName,
+          country: profile.country,
+          password: profile.id,
+          profilePic: proPic !== undefined ? profile.photos[0]?.value : "",
+          spotifyTokens: {
+            access_token: accessToken,
+            refresh_token: refreshToken,
+            expires_in: expires_in,
+          },
 
-          const existingUser = await UserModel.findOneAndUpdate({
-            username: generatedUser.username,
-            spotifyTokens: {
-              access_token: accessToken,
-              refresh_token: refreshToken,
-              expires_in: expires_in,
+          playlists: {
+            userPlaylists: {
+              items: playlists,
             },
+            next: playlistsData.body.next,
+            previous: playlistsData.body.previous,
+            total: playlistsData.body.total,
+          },
+        };
+
+        const existingUser = await UserModel.findOne({
+          username: profile.displayName,
+        });
+        if (existingUser) {
+          const tokens = await authenticateUser(existingUser);
+          done(null, {
+            accessToken,
+            refreshToken,
+            expires_in,
+            profile,
+            tokens,
           });
-          if (existingUser && existingUser.username.length > 0) {
-            const tokens = await authenticateUser(existingUser);
-            done(null, {
-              accessToken,
-              refreshToken,
-              expires_in,
-              profile,
-              tokens,
-            });
-          } else {
-            const newUser = await UserModel.create(generatedUser);
-            const tokens = await authenticateUser(newUser);
+        } else {
+          const newUser = await UserModel.create(generatedUser);
+          const tokens = await authenticateUser(newUser);
 
-            done(null, {
-              accessToken,
-              refreshToken,
-              expires_in,
-              profile,
-              tokens,
-            });
-          }
+          done(null, {
+            accessToken,
+            refreshToken,
+            expires_in,
+            profile,
+            tokens,
+          });
         }
       }
     } catch (error) {
