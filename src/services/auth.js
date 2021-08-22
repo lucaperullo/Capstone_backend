@@ -44,11 +44,26 @@ spotifyRoutes.get(
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
         secure: process.env.NODE_ENV === "production" ? true : false,
       });
-      res.redirect("http://localhost:3000/discover");
+      res.redirect("https://capstonebe.herokuapp.com/discover");
       //
     } catch (error) {
       console.log(error);
       res.status(400).send({ error: error.message });
+    }
+  }
+);
+spotifyRoutes.get(
+  "/favourites",
+  authorizeUser,
+  spotifyAuthentication,
+  async (req, res, next) => {
+    try {
+      const data = await req.spotifyApi.getMySavedTracks({ limit: 50 });
+      if (data.statusCode === 200) {
+        res.send(data.body);
+      }
+    } catch (error) {
+      console.log("Something went wrong!", error);
     }
   }
 );
@@ -127,6 +142,21 @@ spotifyRoutes.post(
   async (req, res, next) => {
     try {
     } catch (error) {}
+  }
+);
+spotifyRoutes.get(
+  "/search/:query",
+  authorizeUser,
+  spotifyAuthentication,
+  async (req, res, next) => {
+    try {
+      const data = await req.spotifyApi.searchTracks(req.params.query);
+      if (data.statusCode === 200) {
+        res.send(data.body);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 );
 spotifyRoutes.post(

@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import SpotifyWebApi from "spotify-web-api-node";
 import axios from "axios";
 import { authorizeUser } from "../../middlewares/jwt.js";
+import { spotifyAuthentication } from "../../middlewares/spotifyAuthentication.js";
 
 const userRoutes = express.Router();
 
@@ -22,33 +23,41 @@ userRoutes.get("/me", authorizeUser, async (req, res, next) => {
   }
 });
 
-userRoutes.put("/follow/:userId", authorizeUser, async (req, res, next) => {
-  try {
-    const actualUser = req.user;
-    const userToFollow = await UserSchema.findById(req.params.userId);
+userRoutes.put(
+  "/follow/:userId/:username",
+  authorizeUser,
+  spotifyAuthentication,
+  async (req, res, next) => {
+    try {
+      const data = await req.spotifyApi.followUsers([req.params.username]);
+      if (data.statusCode === 200) {
+        const actualUser = req.user;
+        const userToFollow = await UserSchema.findById(req.params.userId);
 
-    if (actualUser.contacts.includes(userToFollow._id)) {
-      actualUser.contacts = actualUser.contacts.filter(
-        (u) => u.toString() !== userToFollow._id.toString()
-      );
+        if (actualUser.contacts.includes(userToFollow._id)) {
+          actualUser.contacts = actualUser.contacts.filter(
+            (u) => u.toString() !== userToFollow._id.toString()
+          );
 
-      actualUser.save();
-      res.status(200).send({ message: "user unfollowed" });
-    } else {
-      actualUser.contacts = [...actualUser.contacts, userToFollow._id];
-      const roomIdx = await createRooms(actualUser._id, userToFollow._id);
-      console.log(roomIdx);
-      userToFollow.rooms = [...userToFollow.rooms, roomIdx];
-      actualUser.rooms = [...actualUser.rooms, roomIdx];
-      await actualUser.save();
-      await userToFollow.save();
-      res.status(200).send({ message: "user followed" });
+          actualUser.save();
+          res.status(200).send({ message: "user unfollowed" });
+        } else {
+          actualUser.contacts = [...actualUser.contacts, userToFollow._id];
+          const roomIdx = await createRooms(actualUser._id, userToFollow._id);
+          console.log(roomIdx);
+          userToFollow.rooms = [...userToFollow.rooms, roomIdx];
+          actualUser.rooms = [...actualUser.rooms, roomIdx];
+          await actualUser.save();
+          await userToFollow.save();
+          res.status(200).send({ message: "user followed" });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
     }
-  } catch (error) {
-    console.log(error);
-    next(error);
   }
-});
+);
 
 userRoutes.get("/:id", async (req, res, next) => {
   const user = await UserSchema.findById(req.params.id);

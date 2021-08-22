@@ -61,3 +61,13 @@ export const updateRoomCanvas = async (data) => {
     // console.log(error);
   }
 };
+
+// export const postLikedSong = async (data) => {
+//   try {
+//     await RoomModel.findByIdAndUpdate(data.songId, {
+//       likedSongs: data.likedSongs,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }

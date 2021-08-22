@@ -81,6 +81,21 @@ const createSocketServer = (server) => {
     // socket.on("SEND_IMAGE", async (data) => {
 
     // });
+
+    // socket.on("LIKED_MUSIC", async (data) => {
+    //   try {
+    //     const likedSong = {
+    //       userId: data.userId,
+    //       songId: data.songId,
+    //     }
+    //     await postLikedSong(likedSong);
+    //     console.log(likedSong);
+    //     io.emit("LIKED_MUSIC", likedSong);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // })
+
     socket.on("SEND_MESSAGE", async (data) => {
       const message = {
         roomId: data.roomId,

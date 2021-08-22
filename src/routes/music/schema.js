@@ -2,13 +2,15 @@ import mongoose from "mongoose";
 
 export const MusicModel = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      default: "music history",
-    },
-    history: [
+    liked: [
       {
-        type: String,
+        songId: String,
+        senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        songName: String,
+        artist: String,
+        album: String,
+        albumArt: String,
+        duration: Number,
         unique: true,
       },
     ],
