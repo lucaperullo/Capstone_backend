@@ -17,7 +17,7 @@ const createSocketServer = (server) => {
       origin: [
         "http://localhost",
         "http://localhost:3000",
-        "https://capstone-tau.vercel.app",
+        "https://ourmusic.vercel.app/",
       ],
       methods: ["GET, POST, PUT, DELETE"],
     },
