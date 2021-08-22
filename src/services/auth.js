@@ -44,7 +44,7 @@ spotifyRoutes.get(
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
         secure: process.env.NODE_ENV === "production" ? true : false,
       });
-      res.redirect("https://capstonebe.herokuapp.com/discover");
+      res.redirect("https://capstone-tau.vercel.app/discover");
       //
     } catch (error) {
       console.log(error);
