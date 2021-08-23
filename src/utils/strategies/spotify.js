@@ -49,7 +49,7 @@ const spotifyApi = new SpotifyStrategy(
 
       const playlistsData = await api.getUserPlaylists(profile.username);
       const playlists = playlistsData?.body?.items;
-
+      console.log(profile);
       if (profile) {
         const proPic = profile.photos[0]?.value;
         const generatedUser = {
