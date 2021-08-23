@@ -32,7 +32,9 @@ const corsOptions = {
   origin: [
     "http://localhost",
     "http://localhost:3000",
-    "https://ourmusic.vercel.app/",
+    "https://ourmusic.vercel.app",
+    "https://ourmusic.vercel.app/discover",
+    "https://capstonebe.herokuapp.com",
   ],
   credentials: true,
   // exposedHeaders: ["set-cookie"],
