@@ -17,6 +17,7 @@ const UserModel = new mongoose.Schema({
     type: String,
     unique: true,
   },
+  coverImage: String,
   spotifyTokens: {
     access_token: String,
     refresh_token: String,
