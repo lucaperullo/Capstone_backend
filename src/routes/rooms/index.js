@@ -28,36 +28,6 @@ export const CloudinaryMulter = multer({
 
 const roomRoute = express.Router();
 
-//TODO: Playlist managemement
-
-//Create room when follow a user
-// roomRoute.post("/:participantId", authorizeUser, async (req, res, next) => {
-//   console.log(req.user._id);
-//   try {
-//     const newRoom = await new RoomSchema({
-//       participants: [req.params.participantId, req.user._id],
-//     });
-
-//     const newRoomCreated = await newRoom.save();
-//     newRoomCreated.participants.forEach(async (participant) => {
-//       await UserSchema.findOneAndUpdate(
-//         { _id: participant._id },
-//         {
-//           $push: {
-//             rooms: newRoomCreated._id,
-//           },
-//         },
-//         { runValidators: true, new: true }
-//       );
-//     });
-//     res.status(201).send({ message: newRoomCreated._id });
-//   } catch (error) {
-//     console.log(error);
-//     next(error);
-//   }
-// });
-
-//GET ALL ROOMS
 roomRoute.get("/", authorizeUser, async (req, res, next) => {
   try {
     const allRooms = await RoomSchema.find().populate("participants");
@@ -70,6 +40,7 @@ roomRoute.get("/", authorizeUser, async (req, res, next) => {
 
 //GET ROOM BY ID
 roomRoute.get("/:id", authorizeUser, async (req, res, next) => {
+  console.log("hi");
   try {
     const singleRoom = await RoomSchema.findById(req.params.id);
     if (singleRoom) {

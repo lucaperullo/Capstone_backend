@@ -10,6 +10,6 @@ export const createRooms = async (userId, followingId) => {
       participants: [{ userId: userId }, { userId: followingId }],
     });
     await room.save();
-    return room._id;
+    return room;
   }
 };
