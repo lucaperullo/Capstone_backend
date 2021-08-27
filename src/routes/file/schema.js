@@ -2,10 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import path from "path";
 import crypto from "crypto";
-import GridFsStorage from "multer-gridf-storage"
-import multer from "multer"
-
-
+import GridFsStorage from "multer-gridf-storage";
+import multer from "multer";
 
 const fileRouter = express.Router();
 
@@ -57,7 +55,7 @@ fileRouter.get("/", (req, res) => {
       const f = files
         .map((file) => {
           if (
-              file.contentType === "image/png" ||
+            file.contentType === "image/png" ||
             //   file.contentType === "image/gif" ||
             file.contentType === "image/jpeg"
           ) {

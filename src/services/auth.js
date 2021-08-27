@@ -44,7 +44,11 @@ spotifyRoutes.get(
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", //set to lax when deploy
         secure: process.env.NODE_ENV === "production" ? true : false,
       });
-      res.redirect(process.env.NODE_ENV === "production" ? "https://ourmusic.vercel.app/discover": "http://localhost:3000/discover");
+      res.redirect(
+        process.env.NODE_ENV === "production"
+          ? "https://ourmusic.vercel.app/discover"
+          : "http://localhost:3000/discover"
+      );
       //
     } catch (error) {
       console.log(error);

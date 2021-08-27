@@ -90,7 +90,7 @@ authRoutes.get("/users", authorizeUser, async (req, res, next) => {
   }
 });
 
-authRoutes.get("/me", authorizeUser, async (req, res, next) => {
+authRoutes.get("/auth/me", authorizeUser, async (req, res, next) => {
   try {
     res.send(req.user);
   } catch (error) {
@@ -99,7 +99,7 @@ authRoutes.get("/me", authorizeUser, async (req, res, next) => {
   }
 });
 
-authRoutes.put("/me", authorizeUser, async (req, res, next) => {
+authRoutes.put("/auth/me", authorizeUser, async (req, res, next) => {
   try {
     const editedUser = await UserModel.findByIdAndUpdate(
       req.user._id,
@@ -113,7 +113,7 @@ authRoutes.put("/me", authorizeUser, async (req, res, next) => {
   }
 });
 
-authRoutes.get("/:id", authorizeUser, async (req, res, next) => {
+authRoutes.get("/auth/:id", authorizeUser, async (req, res, next) => {
   try {
     const singleUser = await UserModel.findById(req.params.id).populate(
       "rooms"
@@ -129,7 +129,7 @@ authRoutes.get("/:id", authorizeUser, async (req, res, next) => {
   }
 });
 
-authRoutes.put("/:id", authorizeUser, async (req, res, next) => {
+authRoutes.put("/auth/:id", authorizeUser, async (req, res, next) => {
   try {
     if (req.user._id === req.params.id) {
       const editedUser = await UserModel.findByIdAndUpdate(

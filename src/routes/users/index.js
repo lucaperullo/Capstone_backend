@@ -29,24 +29,29 @@ userRoutes.put(
   spotifyAuthentication,
   async (req, res, next) => {
     try {
-      const data = await req.spotifyApi.followUsers([req.params.username]);
-      if (data.statusCode === 200) {
-        const actualUser = req.user;
-        const userToFollow = await UserSchema.findById(req.params.userId);
+      const actualUser = req.user;
+      const userToFollow = await UserSchema.findById(req.params.userId);
 
-        if (actualUser.contacts.includes(userToFollow._id)) {
+      if (actualUser.contacts.includes(userToFollow._id)) {
+        const data = await req.spotifyApi.unfollowUsers([req.params.username]);
+        console.log("unfollow", data);
+        if (data.statusCode === 204) {
           actualUser.contacts = actualUser.contacts.filter(
             (u) => u.toString() !== userToFollow._id.toString()
           );
 
           actualUser.save();
           res.status(200).send({ message: "user unfollowed" });
-        } else {
+        }
+      } else {
+        const data = await req.spotifyApi.followUsers([req.params.username]);
+        if (data.statusCode === 204) {
+          console.log("follow", data);
           actualUser.contacts = [...actualUser.contacts, userToFollow._id];
-          const roomIdx = await createRooms(actualUser._id, userToFollow._id);
-          console.log(roomIdx);
-          userToFollow.rooms = [...userToFollow.rooms, roomIdx];
-          actualUser.rooms = [...actualUser.rooms, roomIdx];
+          const room = await createRooms(actualUser._id, userToFollow._id);
+          console.log(room);
+          userToFollow.rooms = [...userToFollow.rooms, room._id];
+          actualUser.rooms = [...actualUser.rooms, room._id];
           await actualUser.save();
           await userToFollow.save();
           res.status(200).send({ message: "user followed" });
@@ -59,15 +64,15 @@ userRoutes.put(
   }
 );
 
-userRoutes.get("/:id", async (req, res, next) => {
-  const user = await UserSchema.findById(req.params.id);
-  if (user) {
-    res.send(user).status(200);
-  }
-});
+// userRoutes.get("/:id", async (req, res, next) => {
+//   const user = await UserSchema.findById(req.params.id);
+//   if (user) {
+//     res.send(user).status(200);
+//   }
+// });
 
-userRoutes.delete("/:id", async (req, res, next) => {
-  const user = await UserSchema.findByIdAndDelete(req.params.id);
+userRoutes.delete("/deleteUser", authorizeUser, async (req, res, next) => {
+  const user = await UserSchema.findByIdAndDelete(req.user._id);
   if (user) {
     res.send({ message: "user destroyed" }).status(204);
   }
