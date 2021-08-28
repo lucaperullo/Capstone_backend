@@ -12,14 +12,9 @@ let activeSockets = [];
 
 const createSocketServer = (server) => {
   const io = new Server(server, {
-    allowEIO3: true,
-    cors: {
-      origin: [
-        "http://localhost",
-        "http://localhost:3000",
-        "https://ourmusic.vercel.app/",
-      ],
-      methods: ["GET, POST, PUT, DELETE"],
+    allowRequest: (req, callback) => {
+      const noOriginHeader = req.headers.origin === undefined;
+      callback(null, noOriginHeader);
     },
   });
 

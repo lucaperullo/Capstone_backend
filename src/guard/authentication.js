@@ -92,6 +92,8 @@ authRoutes.get("/users", authorizeUser, async (req, res, next) => {
 
 authRoutes.get("/auth/me", authorizeUser, async (req, res, next) => {
   try {
+    // const user = await UserModel.findById(req.user._id).populate("rooms");
+
     res.send(req.user);
   } catch (error) {
     console.log(error);
@@ -106,6 +108,7 @@ authRoutes.put("/auth/me", authorizeUser, async (req, res, next) => {
       req.body,
       { runValidators: true, new: true }
     ).populate("rooms");
+
     res.send(editedUser);
   } catch (error) {
     console.log(error);
